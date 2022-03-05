@@ -1,10 +1,6 @@
 # Credentials
 env.yaml
 
-# data cache
-data/
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
