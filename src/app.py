@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 import ctypes
 import yaml
-from hashlib import sha256
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from pymongo import MongoClient
 
 from utils.handle_messages import chat_bot_response
-from client import FORMAT, STOP_KEYWORD, Client
+from client import Client
 from threading import Thread
 
 
