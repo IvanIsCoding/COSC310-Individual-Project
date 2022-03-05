@@ -15,13 +15,12 @@ def handle_client(conn: socket, addr):
     print("conn:", conn.getsockname())
 
     msg = None
-    while (msg != "x"):
+    while (msg != STOP_KEYWORD):
         msg = conn.recv(4096).decode(FORMAT)
         if msg == STOP_KEYWORD:
             msg = f'{addr} has left the chat'
-            connections.remove(conn)
-            conn.send('You have left the chat'.encode(FORMAT))
-            conn.close()
+            connections.remove((conn, addr))
+            conn.send(STOP_KEYWORD.encode(FORMAT))
         else:
             print("client ", addr, "says", msg)
 
@@ -47,7 +46,7 @@ while True:
     try:
         conn, addr = s.accept()
         
-        for connection in connections:
+        for connection, _ in connections:
             connection.send(f'{addr} has joined the chat'.encode(FORMAT))
         
         connections.append((conn, addr))

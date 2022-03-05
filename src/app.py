@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import ctypes
 import yaml
 from hashlib import sha256
 from telegram import Update, ForceReply
@@ -7,17 +7,24 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from pymongo import MongoClient
 
 from utils.handle_messages import chat_bot_response
-from client import STOP_KEYWORD, Client
+from client import FORMAT, STOP_KEYWORD, Client
 from threading import Thread
 
-FORMAT = 'utf8'
-is_in_groupchat = False
-mongo_client = MongoClient()
-db = mongo_client.get_database('chatroom')
 
 with open("env.yaml", "r") as env_file:
-    ENV_VARIABLES = yaml.safe_load(env_file)
-    TOKEN = ENV_VARIABLES["TOKEN"]
+    try:
+        ENV_VARIABLES = yaml.safe_load(env_file)
+        TOKEN = ENV_VARIABLES["TOKEN"]
+        DB_HOST = ENV_VARIABLES["DB_HOST"]
+        DB_PORT = ENV_VARIABLES["DB_PORT"]
+        print('Connecting to db...')
+        mongo_client = MongoClient(host=DB_HOST, port=DB_PORT)
+        db = mongo_client['chatroom']
+        db.Clients.delete_many({})
+        print('Connected to db!')
+    except Exception as e:
+        print(e)
+        exit(1)
 
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -31,39 +38,49 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def handle_message(update: Update, context: CallbackContext) -> None:
     """Handle the user message."""
-    if not is_in_groupchat:
+    username = update.message.chat.username
+    person = db.Clients.find_one({"username": username})
+
+    if person is None or person["is_in_groupchat"] is None or not person["is_in_groupchat"]:
         update.message.reply_text(
             chat_bot_response(update.message.text)
         )
-    else:
+        return
+    try:
         username = update.message.chat.username
-        client = db.clients.find_one({"username": username})["client"]
+        client_id = db.Clients.find_one({"username": username})["client"]
+        client = ctypes.cast(client_id, ctypes.py_object).value
         client.send_message(update.message.text)
+    except Exception as e:
+        print(e)
 
 
 def receive_message(update: Update, client: Client) -> None:
     while True:
         message = client.receive_message()
-        update.message.reply_text(
-            message
-        )
+        if message:
+            update.message.reply_text(
+                message
+            )
 
 
 def chatroom(update: Update, context: CallbackContext) -> None:
-    global is_in_groupchat
-    if is_in_groupchat:
+    username = update.message.chat.username
+    person = db.Clients.find_one({"username": username})
+
+    if person is not None and person["is_in_groupchat"] is not None and person["is_in_groupchat"] == True:
         update.message.reply_text(
             "You are already in a chatroom!"
         )
         return
 
     try:
-        is_in_groupchat = True
         client = Client()
         # TODO: Store client in db based on the username
-        db.clients.insert_one({
+        db.Clients.insert_one({
             "username": update.message.chat.username,
-            "client": client
+            "client": id(client),
+            "is_in_groupchat": True
         })
         thread = Thread(target=receive_message, args=(update, client))
         thread.daemon = True
@@ -73,10 +90,9 @@ def chatroom(update: Update, context: CallbackContext) -> None:
 
 
 def leavechat(update: Update, context: CallbackContext) -> None:
-    global is_in_groupchat
-    STOP_KEYWORD = sha256("x".encode(FORMAT)).hexdigest()
-
     username = update.message.chat.username
+    is_in_groupchat = db.Clients.find_one({"username": username})[
+        "is_in_groupchat"]
 
     if not is_in_groupchat:
         update.message.reply_text(
@@ -86,9 +102,8 @@ def leavechat(update: Update, context: CallbackContext) -> None:
 
     try:
         # TODO: Look up db for client and end connection
-        client = db.clients.find_one({"username": username})["client"]
-        client.send_message(STOP_KEYWORD)
-        is_in_groupchat = False
+        db.Clients.find_one_and_update({"username": username}, {
+                                       '$set': {"is_in_groupchat": False}})
         update.message.reply_text(
             "You have left the chatroom!"
         )
