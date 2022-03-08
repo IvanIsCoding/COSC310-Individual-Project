@@ -3,7 +3,7 @@ import ctypes
 import yaml
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from pymongo import MongoClient
+import sqlite3
 
 from utils.handle_messages import chat_bot_response
 from client import Client
@@ -14,12 +14,13 @@ with open("env.yaml", "r") as env_file:
     try:
         ENV_VARIABLES = yaml.safe_load(env_file)
         TOKEN = ENV_VARIABLES["TOKEN"]
-        DB_HOST = ENV_VARIABLES["DB_HOST"]
-        DB_PORT = ENV_VARIABLES["DB_PORT"]
         print('Connecting to db...')
-        mongo_client = MongoClient(host=DB_HOST, port=DB_PORT)
-        db = mongo_client['chatroom']
-        db.Clients.delete_many({})
+        DB_DIR = './src/data/data.db'
+        open(DB_DIR, 'w').close()
+        db_conn = sqlite3.connect(DB_DIR, check_same_thread=False)
+        c = db_conn.cursor()
+        c.execute(
+            "CREATE TABLE clients (user_id TEXT, is_in_groupchat BOOLEAN, client INT)")
         print('Connected to db!')
     except Exception as e:
         print(e)
@@ -37,17 +38,18 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def handle_message(update: Update, context: CallbackContext) -> None:
     """Handle the user message."""
-    username = update.message.chat.username
-    person = db.Clients.find_one({"username": username})
+    user_id = update.message.from_user.id
+    c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
+    person = c.fetchone()
 
-    if person is None or person["is_in_groupchat"] is None or not person["is_in_groupchat"]:
+    if person is None or person[1] is None or person[1] == False:
         update.message.reply_text(
             chat_bot_response(update.message.text)
         )
         return
+
     try:
-        username = update.message.chat.username
-        client_id = db.Clients.find_one({"username": username})["client"]
+        client_id = person[2]
         client = ctypes.cast(client_id, ctypes.py_object).value
         client.send_message(update.message.text)
     except Exception as e:
@@ -64,23 +66,32 @@ def receive_message(update: Update, client: Client) -> None:
 
 
 def chatroom(update: Update, context: CallbackContext) -> None:
-    username = update.message.chat.username
-    person = db.Clients.find_one({"username": username})
+    user_id = update.message.from_user.id
+    
+    c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
+    person = c.fetchone()
 
-    if person is not None and person["is_in_groupchat"] is not None and person["is_in_groupchat"] == True:
-        update.message.reply_text(
-            "You are already in a chatroom!"
-        )
+    if person is not None and person[1] is not None:
+        if person[1] == True:
+            update.message.reply_text(
+                "You are already in a chatroom!"
+            )
+        else:
+            c.execute("UPDATE clients SET is_in_groupchat = ? WHERE user_id = ?", (True, user_id))
+            print(c.fetchone())
+            db_conn.commit()
         return
 
     try:
         client = Client()
-        # TODO: Store client in db based on the username
-        db.Clients.insert_one({
-            "username": update.message.chat.username,
-            "client": id(client),
-            "is_in_groupchat": True
-        })
+        # TODO: Store client in db based on the user_id
+        c.execute('INSERT INTO clients VALUES (?, ?, ?)',
+                  (user_id, True, id(client)))
+        db_conn.commit()
+        update.message.reply_text(
+            "Welcome to the chatroom!"
+        )
+
         thread = Thread(target=receive_message, args=(update, client))
         thread.daemon = True
         thread.start()
@@ -89,11 +100,12 @@ def chatroom(update: Update, context: CallbackContext) -> None:
 
 
 def leavechat(update: Update, context: CallbackContext) -> None:
-    username = update.message.chat.username
-    is_in_groupchat = db.Clients.find_one({"username": username})[
-        "is_in_groupchat"]
+    user_id = update.message.from_user.id
+    
+    c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
+    person = c.fetchone()
 
-    if not is_in_groupchat:
+    if person is None or person[1] is None or person[1] == False:
         update.message.reply_text(
             "You are not in a chatroom!"
         )
@@ -101,8 +113,8 @@ def leavechat(update: Update, context: CallbackContext) -> None:
 
     try:
         # TODO: Look up db for client and end connection
-        db.Clients.find_one_and_update({"username": username}, {
-                                       '$set': {"is_in_groupchat": False}})
+        c.execute("UPDATE clients SET is_in_groupchat = ? WHERE user_id = ?", (False, user_id))
+        db_conn.commit()
         update.message.reply_text(
             "You have left the chatroom!"
         )
