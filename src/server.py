@@ -1,4 +1,5 @@
 import socket
+from sqlite3 import connect
 import threading
 from hashlib import sha256
 
@@ -10,6 +11,7 @@ STOP_KEYWORD = sha256("x".encode(FORMAT)).hexdigest()
 
 connections = []
 
+
 def handle_client(conn: socket, addr):
 
     print("conn:", conn.getsockname())
@@ -17,19 +19,26 @@ def handle_client(conn: socket, addr):
     msg = None
     while (msg != STOP_KEYWORD):
         msg = conn.recv(4096).decode(FORMAT)
-        if msg == STOP_KEYWORD:
-            msg = f'{addr} has left the chat'
+        index = connections.index((conn, addr))
+        if (msg == STOP_KEYWORD):
             connections.remove((conn, addr))
-            conn.send(STOP_KEYWORD.encode(FORMAT))
-        else:
+            for connection, _ in connections:
+                if len(connections) < 2:
+                    connection.send('1 person has left the chat! There is only you left'.encode(FORMAT))
+                else:
+                    connection.send(f'1 person has left the chat! There are {len(connections)} people left'.encode(FORMAT))
+
+            break
+
+        print(msg)
+
+        if msg:
             print("client ", addr, "says", msg)
-
-        for connection, address in connections:
-            if (connection != conn):
-                connection.send(f'{address}: {msg}'.encode(FORMAT))
-
+            for connection, _ in connections:
+                if (connection != conn):
+                    connection.send(f'Anonymous: {msg}'.encode(FORMAT))
     print("client", addr, "finished")
-    print(conn.getsockname(), "closed")
+    print(conn.getsockname(), "exit")
     conn.close()
 
 
@@ -45,17 +54,17 @@ print("Waiting for Client")
 while True:
     try:
         conn, addr = s.accept()
-        
         for connection, _ in connections:
-            connection.send(f'{addr} has joined the chat'.encode(FORMAT))
-        
-        connections.append((conn, addr))
-        conn.send('You have joined the chat'.encode(FORMAT))
-        print(connections)
+            connection.send(
+                f'1 person has joined the chat! People in the chat: {len(connections) + 1}'.encode(FORMAT))
 
-        thr = threading.Thread(target=handle_client, args=(conn, addr))
-        thr.daemon = False
-        thr.start()
+        if (conn, addr) not in connections:
+            thr = threading.Thread(target=handle_client, args=(conn, addr))
+            thr.daemon = False
+            thr.start()
+
+            connections.append((conn, addr))
+        print(conn)
 
     except Exception as e:
         print(e)

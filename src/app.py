@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 import sqlite3
 
 from utils.handle_messages import chat_bot_response
-from client import Client
+from client import FORMAT, STOP_KEYWORD, Client
 from threading import Thread
 
 
@@ -20,7 +20,7 @@ with open("env.yaml", "r") as env_file:
         db_conn = sqlite3.connect(DB_DIR, check_same_thread=False)
         c = db_conn.cursor()
         c.execute(
-            "CREATE TABLE clients (user_id TEXT, is_in_groupchat BOOLEAN, client INT)")
+            "CREATE TABLE clients (user_id TEXT, client INT)")
         print('Connected to db!')
     except Exception as e:
         print(e)
@@ -42,14 +42,14 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
     person = c.fetchone()
 
-    if person is None or person[1] is None or person[1] == False:
+    if not person:
         update.message.reply_text(
             chat_bot_response(update.message.text)
         )
         return
 
     try:
-        client_id = person[2]
+        client_id = person[1]
         client = ctypes.cast(client_id, ctypes.py_object).value
         client.send_message(update.message.text)
     except Exception as e:
@@ -57,67 +57,71 @@ def handle_message(update: Update, context: CallbackContext) -> None:
 
 
 def receive_message(update: Update, client: Client) -> None:
-    while True:
-        message = client.receive_message()
-        if message:
-            update.message.reply_text(
-                message
-            )
+    try:
+        while True:
+            message = client.receive_message()
+            if message == STOP_KEYWORD:
+                return
+            if message:
+                update.message.reply_text(
+                    message
+                )
+    except Exception as e:
+        print(e)
 
 
 def chatroom(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
-    
+
     c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
     person = c.fetchone()
 
-    if person is not None and person[1] is not None:
-        if person[1] == True:
-            update.message.reply_text(
-                "You are already in a chatroom!"
-            )
-        else:
-            c.execute("UPDATE clients SET is_in_groupchat = ? WHERE user_id = ?", (True, user_id))
-            print(c.fetchone())
-            db_conn.commit()
+    if person is not None:
+        update.message.reply_text(
+            "You are already in a chatroom!"
+        )
         return
 
     try:
         client = Client()
         # TODO: Store client in db based on the user_id
-        c.execute('INSERT INTO clients VALUES (?, ?, ?)',
-                  (user_id, True, id(client)))
+        c.execute('INSERT INTO clients VALUES (?, ?)',
+                  (user_id, id(client)))
         db_conn.commit()
         update.message.reply_text(
             "Welcome to the chatroom!"
         )
 
-        thread = Thread(target=receive_message, args=(update, client))
-        thread.daemon = True
+        thread = Thread(target=receive_message, args=(update, client), daemon=True)
         thread.start()
     except Exception as e:
         print(e)
 
 
-def leavechat(update: Update, context: CallbackContext) -> None:
+def leaveroom(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
-    
+
     c.execute("SELECT * FROM clients WHERE user_id = ?", (user_id,))
     person = c.fetchone()
 
-    if person is None or person[1] is None or person[1] == False:
+    if not person:
         update.message.reply_text(
             "You are not in a chatroom!"
         )
         return
 
     try:
-        # TODO: Look up db for client and end connection
-        c.execute("UPDATE clients SET is_in_groupchat = ? WHERE user_id = ?", (False, user_id))
+        client_id = person[1]
+        client = ctypes.cast(client_id, ctypes.py_object).value
+        c.execute("DELETE FROM clients WHERE user_id = ?", (user_id,))
         db_conn.commit()
+
+        client.send_message(STOP_KEYWORD)
+
         update.message.reply_text(
             "You have left the chatroom!"
         )
+
     except Exception as e:
         print(e)
 
@@ -138,7 +142,7 @@ def main() -> None:
         Filters.text & ~Filters.command, handle_message))
 
     dispatcher.add_handler(CommandHandler("chatroom", chatroom))
-    dispatcher.add_handler(CommandHandler("leaveroom", leavechat))
+    dispatcher.add_handler(CommandHandler("leaveroom", leaveroom))
 
     # Start the Bot
     updater.start_polling()
