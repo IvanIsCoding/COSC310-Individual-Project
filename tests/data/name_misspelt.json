@@ -1,0 +1,44 @@
+{
+  "responseId": "4e006935-9de8-49e8-837e-ed6df7fa90a1-e5ce3fa9",
+  "queryResult": {
+    "queryText": "What is your naem?",
+    "action": "input.unknown",
+    "parameters": {},
+    "allRequiredParamsPresent": true,
+    "fulfillmentText": "I missed that, say that again?",
+    "fulfillmentMessages": [
+      {
+        "text": {
+          "text": [
+            "I missed that, say that again?"
+          ]
+        }
+      }
+    ],
+    "outputContexts": [
+      {
+        "name": "projects/cosc310-a3/agent/sessions/25824181-e071-b803-1335-16d7765820c9/contexts/__system_counters__",
+        "lifespanCount": 1,
+        "parameters": {
+          "no-input": 0,
+          "baby.original": "baby",
+          "no-match": 1,
+          "baby": "baby"
+        }
+      }
+    ],
+    "intent": {
+      "name": "projects/cosc310-a3/agent/intents/fb83ba9e-8df5-41b3-af21-c97635f4e588",
+      "displayName": "Default Fallback Intent",
+      "isFallback": true
+    },
+    "intentDetectionConfidence": 1,
+    "languageCode": "en",
+    "sentimentAnalysisResult": {
+      "queryTextSentiment": {
+        "score": -0.1,
+        "magnitude": 0.1
+      }
+    }
+  }
+}
