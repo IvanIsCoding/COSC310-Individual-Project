@@ -1,0 +1,49 @@
+{
+    "responseId": "71acd856-e883-485e-9a3a-29ee16ea577e-e5ce3fa9",
+    "queryResult": {
+      "queryText": "Can you tell me more about Tesl?",
+      "parameters": {
+        "Companies": "Tesla"
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              "Tesla is accelerating the world's transition to sustainable \n                energy with electric cars - maybe you should buy one!"
+            ]
+          }
+        }
+      ],
+      "outputContexts": [
+        {
+          "name": "projects/cosc310-a3/agent/sessions/25824181-e071-b803-1335-16d7765820c9/contexts/companiesintent-followup",
+          "lifespanCount": 5,
+          "parameters": {
+            "Companies": "Tesla",
+            "Companies.original": "Tesl",
+            "baby": "baby",
+            "baby.original": "baby"
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/cosc310-a3/agent/intents/cd6a9105-bfa7-4050-b245-b41eaa633c53",
+        "displayName": "What Company Does Intent"
+      },
+      "intentDetectionConfidence": 1,
+      "diagnosticInfo": {
+        "webhook_latency_ms": 73
+      },
+      "languageCode": "en",
+      "sentimentAnalysisResult": {
+        "queryTextSentiment": {
+          "score": -0.1,
+          "magnitude": 0.1
+        }
+      }
+    },
+    "webhookStatus": {
+      "message": "Webhook execution successful"
+    }
+  }

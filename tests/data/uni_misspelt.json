@@ -1,0 +1,43 @@
+{
+    "responseId": "6a8857eb-3829-48bb-9175-6bdb71b12f80-e5ce3fa9",
+    "queryResult": {
+      "queryText": "Which univeristy did you attend?",
+      "parameters": {
+        "university": "university"
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentText": "I have a degree in Physics and business from the University of Pennsylvania.",
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              "I have a degree in Physics and business from the University of Pennsylvania."
+            ]
+          }
+        }
+      ],
+      "outputContexts": [
+        {
+          "name": "projects/cosc310-a3/agent/sessions/25824181-e071-b803-1335-16d7765820c9/contexts/companiesintent-followup",
+          "lifespanCount": 3,
+          "parameters": {
+            "university.original": "univeristy",
+            "baby": "baby",
+            "university": "university",
+            "Companies.original": "Nueralink",
+            "baby.original": "baby",
+            "Companies": "Neuralink"
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/cosc310-a3/agent/intents/26386ca1-b69a-41c4-84f5-9ae662e76568",
+        "displayName": "What Is Your Degree Intent"
+      },
+      "intentDetectionConfidence": 0.6981371,
+      "languageCode": "en",
+      "sentimentAnalysisResult": {
+        "queryTextSentiment": {}
+      }
+    }
+  }

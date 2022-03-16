@@ -1,0 +1,46 @@
+{
+    "responseId": "64356dee-8b8f-4a6a-9e82-04bff14adfb9-e5ce3fa9",
+    "queryResult": {
+      "queryText": "What is Nueralink?",
+      "parameters": {
+        "Companies": "Neuralink"
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              "We're developing high bandwidth brain-machine interfaces \n                to connect humans and machines at Neuralink"
+            ]
+          }
+        }
+      ],
+      "outputContexts": [
+        {
+          "name": "projects/cosc310-a3/agent/sessions/25824181-e071-b803-1335-16d7765820c9/contexts/companiesintent-followup",
+          "lifespanCount": 5,
+          "parameters": {
+            "Companies": "Neuralink",
+            "baby.original": "baby",
+            "baby": "baby",
+            "Companies.original": "Nueralink"
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/cosc310-a3/agent/intents/cd6a9105-bfa7-4050-b245-b41eaa633c53",
+        "displayName": "What Company Does Intent"
+      },
+      "intentDetectionConfidence": 1,
+      "diagnosticInfo": {
+        "webhook_latency_ms": 995
+      },
+      "languageCode": "en",
+      "sentimentAnalysisResult": {
+        "queryTextSentiment": {}
+      }
+    },
+    "webhookStatus": {
+      "message": "Webhook execution successful"
+    }
+  }
