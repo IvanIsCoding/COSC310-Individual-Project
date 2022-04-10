@@ -12,9 +12,7 @@ def handle_twitter(query_result):
     try:
         
         bearer_token = os.getenv("TWITTER_TOKEN")
-        auth = tweepy.OAuth2BearerHandler(bearer_token)
-
-        api = tweepy.API(auth)
+        client = tweepy.Client(bearer_token)
 
         if "Twitter" in query_result["parameters"]:
             twitter_user = query_result["parameters"]["Twitter"]
@@ -24,9 +22,13 @@ def handle_twitter(query_result):
         if twitter_user == "":
             twitter_user = "@elonmusk"
         
-        user_tweets = api.user_timeline(screen_name=twitter_user.replace("@", ""))
+        user_id_query = client.get_users(
+            usernames=[twitter_user.replace("@", "")]
+        )
+        user_id = user_id_query[0][0].id
+        response = client.get_users_tweets(user_id)
 
-        latest_tweet = user_tweets[0]
+        latest_tweet = response.data[0]
 
         return [f"{twitter_user} latest tweet: {latest_tweet.text}"]
 
