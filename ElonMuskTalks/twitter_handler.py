@@ -30,5 +30,6 @@ def handle_twitter(query_result):
 
         return [f"{twitter_user} latest tweet: {latest_tweet.text}"]
 
-    except:
+    except Exception as e:
+        logging.info(f"Twitter Exception: {e}")
         return ["My engineers are working on this right now - thanks for talking to Elon Musk Bot"]
