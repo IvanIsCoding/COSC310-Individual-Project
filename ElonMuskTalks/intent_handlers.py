@@ -1,9 +1,11 @@
-import random
+import logging
+import azure.functions as func
 
+import random
 
 def handle_what_company_intent(query_result):
     """Returns list of text messages for the What Company Intent"""
-    print(f"DEBUG: What Company Intent")
+    logging.info(f"DEBUG: What Company Intent")
 
     try:
         company = query_result["parameters"]["Companies"]
@@ -54,7 +56,7 @@ def handle_what_company_intent(query_result):
 
 def handle_WorkatSpaceXIntent_followup(query_result):
     """Returns list of text messages for the Work at SpaceX follow-up Intent"""
-    print(f"DEBUG: Work at SpaceX follow-up Intent")
+    logging.info(f"DEBUG: Work at SpaceX follow-up Intent")
 
     try:
         position = query_result["parameters"]["position"]
@@ -94,7 +96,7 @@ def handle_WorkatSpaceXIntent_followup(query_result):
 
 def handle_crypto_advice_intent(query_result):
     """Returns list of text messages for the Crypto Advice Intent"""
-    print(f"DEBUG: Crypto Advice Intent")
+    logging.info(f"DEBUG: Crypto Advice Intent")
 
     try:
         crypto = query_result["parameters"]["crypto"]
@@ -124,7 +126,7 @@ def handle_crypto_advice_intent(query_result):
 
 def handle_what_is_crypto_intent(query_result):
     """Returns list of text messages for the What is Crypto Intent"""
-    print(f"DEBUG: What is Crypto Intent")
+    logging.info(f"DEBUG: What is Crypto Intent")
 
     try:
         crypto = query_result["parameters"]["crypto"][0]
@@ -154,7 +156,7 @@ def handle_what_is_crypto_intent(query_result):
 
 def handle_billionaire_tax_intent(query_result):
     """Returns list of text messages for the Billionaire Tax Intent"""
-    print(f"DEBUG: Billionaire Tax Intent")
+    logging.info(f"DEBUG: Billionaire Tax Intent")
 
     try:
         tax = query_result["parameters"]["Tax"] # note: tax can also be a litst
@@ -173,7 +175,7 @@ def handle_billionaire_tax_intent(query_result):
         return ["My engineers are working on this right now - thanks for talking to Elon Musk Bot"]
 
 def handle_daily_routine_intent(query_result):
-    print(f"DEBUG: Daily Routine Intent")
+    logging.info(f"DEBUG: Daily Routine Intent")
     # Souce: https://finty.com/us/daily-routines/elon-musk/
 
     try:
@@ -215,7 +217,7 @@ def handle_daily_routine_intent(query_result):
 
 def handle_NeuralinkAppIntent_followup(query_result):
     """Returns list of text messages for the Neuralink Applications follow-up Intent"""
-    print(f"DEBUG: Neuralink Applications follow-up Intent")
+    logging.info(f"DEBUG: Neuralink Applications follow-up Intent")
     
     try:
         app = query_result["parameters"]["NeuralinkApp"]
@@ -248,7 +250,7 @@ def handle_NeuralinkAppIntent_followup(query_result):
 
 def handle_fight_putin_intent(query_result):
     """Returns list of text messages for the Fight Putin Intent"""
-    print(f"DEBUG: Fight Putin Intent")
+    logging.info(f"DEBUG: Fight Putin Intent")
     
     try:
         russia = query_result["parameters"]["russia"]
@@ -275,7 +277,7 @@ def handle_fight_putin_intent(query_result):
 
 def handle_stand_with_ukraine_intent(query_result):
     """Returns list of text messages for the Stand With Ukraine Intent"""
-    print(f"DEBUG: Stand With Ukraine Intent")
+    logging.info(f"DEBUG: Stand With Ukraine Intent")
     
     try:
         ukraine = query_result["parameters"]["ukraine"]
