@@ -3,3 +3,4 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
+tweepy~=4.8.0

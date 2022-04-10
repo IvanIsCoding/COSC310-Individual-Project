@@ -1,0 +1,49 @@
+{
+    "responseId": "2189739a-fdb3-4e34-b960-ccc4fe081e38-7b9a0dae",
+    "queryResult": {
+      "queryText": "Tell me @elonmusk last tweet",
+      "parameters": {
+        "Twitter": "@elonmusk"
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              "My engineers are working on this right now - thanks for talking to Elon Musk Bot"
+            ]
+          }
+        }
+      ],
+      "outputContexts": [
+        {
+          "name": "projects/assignment4-cosc310-agent-kcvn/agent/sessions/ed57344c-136a-11a4-af2b-cb07d6b2be9f/contexts/companiesintent-followup",
+          "lifespanCount": 1,
+          "parameters": {
+            "Twitter": "@elonmusk",
+            "Twitter.original": "@elonmusk",
+            "Companies": "Tesla",
+            "Companies.original": "tesla"
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/assignment4-cosc310-agent-kcvn/agent/intents/360d3ee5-5cb9-4712-8aef-8dfc61fd4068",
+        "displayName": "Twitter Intent"
+      },
+      "intentDetectionConfidence": 0.76962376,
+      "diagnosticInfo": {
+        "webhook_latency_ms": 195
+      },
+      "languageCode": "en",
+      "sentimentAnalysisResult": {
+        "queryTextSentiment": {
+          "score": -0.3,
+          "magnitude": 0.3
+        }
+      }
+    },
+    "webhookStatus": {
+      "message": "Webhook execution successful"
+    }
+  }

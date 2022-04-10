@@ -3,6 +3,7 @@ import azure.functions as func
 import json
 
 from .intent_handlers import *
+from .twitter_handler import *
 
 import random
 
@@ -25,6 +26,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         "Neuralink Applications Intent - custom": handle_NeuralinkAppIntent_followup,
         "Fight Putin Intent": handle_fight_putin_intent,
         "Stand With Ukraine Intent": handle_stand_with_ukraine_intent,
+        "Twitter Intent": handle_twitter,
     }
 
     try:
