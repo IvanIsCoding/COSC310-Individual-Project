@@ -33,7 +33,13 @@ def handle_wolfram(query_result):
         return {
         "fulfillmentMessages": [
             {"card": {"title": "Elon Did the Math","imageUri": imgUri,}}
-            ]
+            ],
+        "payload": {
+                "telegram": {
+                    "text": f"![]({imgUri})",
+                    "parse_mode": "Markdown"
+                }
+            }
         }
 
     except Exception as e:
