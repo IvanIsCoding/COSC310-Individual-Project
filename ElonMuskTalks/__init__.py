@@ -4,6 +4,7 @@ import json
 
 from .intent_handlers import *
 from .twitter_handler import *
+from .wolfram_handler import *
 
 import random
 
@@ -27,6 +28,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         "Fight Putin Intent": handle_fight_putin_intent,
         "Stand With Ukraine Intent": handle_stand_with_ukraine_intent,
         "Twitter Intent": handle_twitter,
+        "Wolfram Intent": handle_wolfram,
     }
 
     try:
@@ -35,6 +37,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         if user_intent in intent_dictionary:
             answer_list = intent_dictionary[user_intent](query_result)
+
+            if user_intent == "Wolfram Intent":
+                # Special case to return image
+                return func.HttpResponse(json.dumps(answer_list))
+
         else:
             answer_list = ["My engineers are working on this right now - thanks for talking to Elon Musk Bot"]
     except:

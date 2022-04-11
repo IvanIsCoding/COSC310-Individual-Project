@@ -4,3 +4,4 @@
 
 azure-functions
 tweepy~=4.8.0
+wolframalpha~=5.0
