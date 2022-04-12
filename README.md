@@ -46,7 +46,7 @@ python -m unittest discover tests
 Elon likes Twitter so much that he bought 9% of it! Like the real Elon, our bot can also check Twitter. If you ask him for this latest tweet, he is going to share what he posted on @elonmusk. You can also ask what other people posted!
 
 <p align="center"> 
-<img width="800" height="300" src="static/img/ElonTwitter.png">
+<img width="600" height="800" src="static/img/ElonTwitter.png">
 </p>
 
 In the conversation above, we ask Elon what he tweeted and it was a post mentioning Jeff Bezzos. Then, we ask Elon what Bezzos posted, and get the tweet. Lastly, we are curious about what other billionaires are tweeting hence we ask what Bill Gates posted too.
@@ -56,7 +56,7 @@ In the conversation above, we ask Elon what he tweeted and it was a post mention
 Elon has a bachelor's degree in Physics and likes doing math. Hence, we used the Wolfram Alpha API to let our Elon Musk bot do math just as the real Elon!
 
 <p align="center"> 
-<img width="800" height="300" src="static/img/ElonDidTheMath.png">
+<img width="600" height="500" src="static/img/ElonDidTheMath.png">
 </p>
 
 In the conversation above, the bot answer questions such as "Calculate the second derivative of (x+1)^3" and displays the result as an image. 
